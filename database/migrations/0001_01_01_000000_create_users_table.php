@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Users\Administrator;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,15 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('administrators', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
+            $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('image')->nullable();
-            $table->integer('status')->default(User::STATUS_PENDING);
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

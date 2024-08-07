@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Users;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,13 +9,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class Administrator extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes, HasRoles;
-
-    public const STATUS_ACTIVE = '3';
-    public const STATUS_PENDING = '2';
-    public const STATUS_INACTIVE = '1';
 
     /**
      * The attributes that are mass assignable.
@@ -23,7 +19,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'password', 'status', 'image',
+        'name', 'email', 'password',
     ];
 
     /**
@@ -46,7 +42,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'status' => 'integer',
         ];
     }
 }
