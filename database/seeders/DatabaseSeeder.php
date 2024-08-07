@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Users\Administrator;
-use Illuminate\Database\Seeder;
-
+use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,10 +13,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Administrator::factory(10)->create();
+        // User::factory(10)->create();
 
-        Administrator::factory()->create([
-            'name' => 'Test Administrator',
+        User::factory()->create([
+            'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
     }
