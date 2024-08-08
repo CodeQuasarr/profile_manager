@@ -34,6 +34,11 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * @description Récupère le profil de l'utilisateur connecté.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function profile(Request $request): JsonResponse
     {
         $user = Auth::user();
@@ -44,6 +49,14 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * @description Crée un nouvel utilisateur.
+     *
+     * Cette méthode Va créer un coach par défaut lors de l'inscription.
+     *
+     * @param RegisterRequest $request
+     * @return JsonResponse
+     */
     public function register(RegisterRequest $request): JsonResponse
     {
 
@@ -54,8 +67,15 @@ class AuthController extends Controller
             'password' => bcrypt($request->password)
         ]);
 
-
-        $user->save();
+        $succes = $user->save();
+        if (!$succes) {
+            // return error
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur s\'est produite, Veuillez réessayer',
+                'data' => []
+            ], 500);
+        }
         $user->assignRole(Role::COACH);
 
         return response()->json([
@@ -65,6 +85,11 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * @description Déconnecte l'utilisateur (révoque le jeton d'accès).
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->token()->revoke();
