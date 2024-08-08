@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Http\Controllers\Api\v1;
+
+use App\Http\Controllers\Controller;
+use App\Mail\SendSuccessfulAccountCreation;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+class MailController extends Controller
+{
+    /**
+     * @description Envoie un mail de confirmation de création de compte au nouvel utilisateur avec le Role de coach.
+     * @param string $email
+     * @param string $userName
+     * @return void | JsonResponse
+     */
+    public static function sendSuccessfulAccountCreation(string $email, string $userName)
+    {
+        try {
+            $response = Mail::to($email)->send(new SendSuccessfulAccountCreation($userName));
+        } catch (\Exception $e) {
+             Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Failed to send Auth API key '. $e->getMessage(),
+            ], 500);
+        }
+    }
+}

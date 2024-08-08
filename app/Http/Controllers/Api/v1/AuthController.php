@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\Users\Role;
 use App\Models\Users\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,14 +60,20 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
+        // Assigner une clé API unique pour les Coachs
+        // Elle sera Modifier plus tard lorsque le système de paiement sera mis en place
+        $apiKey = hash('sha256', uniqid());
 
         $user = new User([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
-            'password' => bcrypt($request->password)
+            'password' => bcrypt($request->password),
+            'api_key' => $apiKey,
+            'status' => User::STATUS_ACTIVE,
         ]);
 
+        $user->email_verified_at = Carbon::now();
         $succes = $user->save();
         if (!$succes) {
             // return error
@@ -80,7 +87,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'User created successfully',
+            'message' => 'Votre compte a été créé avec succès; Un email de confirmation vous a été envoyé',
             'data' => []
         ], 201);
     }
