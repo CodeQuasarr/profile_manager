@@ -14,7 +14,6 @@ class Role extends SpatieRole
     public const ADMINiSTRATOR = "administrator";
     public const COACH = "coach";
     public const PLAYER = "player";
-    public const USER = "user";
 
 
     /* METHODS

@@ -76,3 +76,25 @@ if (!function_exists('check_token_expiration')) {
         }
     }
 }
+
+if (!function_exists('uppercase_first_letter')) {
+    /**
+     * @param string $string
+     * @return string
+     */
+    function uppercase_first_letter(string $string): string
+    {
+        return ucfirst($string);
+    }
+}
+
+if (!function_exists('uppercase_char')) {
+    /**
+     * @param string $string
+     * @return string
+     */
+    function uppercase_char(string $string): string
+    {
+        return strtoupper($string);
+    }
+}

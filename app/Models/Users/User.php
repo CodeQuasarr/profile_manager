@@ -63,6 +63,34 @@ class User extends Authenticatable
         ];
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($user) {
+           self::formatNames($user);
+        });
+
+        static::creating(function ($user) {
+            self::formatNames($user);
+        });
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'email' => $this->email,
+        ];
+    }
+
+    protected static function formatNames(User $user): void
+    {
+        $user->last_name = strtoupper($user->last_name);
+        $user->first_name = ucfirst($user->first_name);
+    }
+
     /**
      * @description Recupère le nom complet de l'utilisateur.
      * @return string

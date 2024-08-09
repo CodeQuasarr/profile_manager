@@ -5,6 +5,5 @@ return [
         'administrator'         =>          "Administrateur",
         'coach'                 =>          "Coach",
         'player'                =>          "Joueur",
-        'user'                  =>          "Utilisateur",
     ],
 ];
