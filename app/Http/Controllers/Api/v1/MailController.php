@@ -14,13 +14,15 @@ class MailController extends Controller
     /**
      * @description Envoie un mail de confirmation de création de compte au nouvel utilisateur avec le Role de coach.
      * @param string $email
-     * @param string $userName
+     * @param string $viewPath
+     * @param string $theSubject
+     * @param string $mailContents
      * @return void | JsonResponse
      */
-    public static function sendSuccessfulAccountCreation(string $email, string $userName)
+    public static function sendSuccessfulAccountCreation(string $email, string $viewPath, string $theSubject, array $mailContents = [])
     {
         try {
-            $response = Mail::to($email)->send(new SendSuccessfulAccountCreation($userName));
+            Mail::to($email)->send(new SendSuccessfulAccountCreation($viewPath, $theSubject, $mailContents));
         } catch (\Exception $e) {
              Log::error($e->getMessage());
             return response()->json([

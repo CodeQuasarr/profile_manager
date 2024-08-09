@@ -16,10 +16,11 @@ class SendSuccessfulAccountCreation extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(protected string $userName)
-    {
-        //
-    }
+    public function __construct(
+        protected string $viewPath,
+        protected string $theSubject,
+        public array $mailContents = [],
+    ){}
 
     /**
      * Get the message envelope.
@@ -27,7 +28,7 @@ class SendSuccessfulAccountCreation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Votre compte a été créé avec succès',
+            subject: $this->theSubject,
         );
     }
 
@@ -37,8 +38,8 @@ class SendSuccessfulAccountCreation extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.successCreation',
-            with: ['userName' => $this->userName],
+            view: $this->viewPath,
+            with: $this->mailContents,
         );
     }
 

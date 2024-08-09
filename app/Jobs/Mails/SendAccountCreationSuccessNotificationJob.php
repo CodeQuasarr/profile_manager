@@ -16,16 +16,18 @@ class SendAccountCreationSuccessNotificationJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(protected string $email, protected string $userName)
-    {
-        //
-    }
+    public function __construct(
+        protected string $email,
+        protected string $viewPath,
+        protected string $theSubject,
+        protected array $mailContents = []
+    ){}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        MailController::sendSuccessfulAccountCreation($this->email, $this->userName);
+        MailController::sendSuccessfulAccountCreation($this->email, $this->viewPath, $this->theSubject, $this->mailContents);
     }
 }

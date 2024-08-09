@@ -17,7 +17,7 @@ class RolesAndPermissionsUpdated extends Command
      *
      * @var string
      */
-    protected $signature = 'app:roles-and-permissions-updated';
+    protected $signature = 'roles-and-permissions-updated';
 
     /**
      * The console command description.
