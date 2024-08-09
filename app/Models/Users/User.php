@@ -6,6 +6,7 @@ namespace App\Models\Users;
 use App\Observers\Users\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -36,7 +37,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'password', 'api_key', 'status', 'image',
+        'first_name', 'last_name', 'email', 'password', 'api_key', 'status', 'image', 'email_verified_at',
+        'weight', 'height', 'game_position',
     ];
 
     /**
@@ -60,6 +62,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => 'integer',
+            'weight' => 'integer',
+            'height' => 'integer',
         ];
     }
 
@@ -98,5 +102,10 @@ class User extends Authenticatable
     public function getName(): string
     {
         return $this->first_name . ' ' . $this->last_name;
+    }
+
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(UserInvitation::class, 'coach_id');
     }
 }
