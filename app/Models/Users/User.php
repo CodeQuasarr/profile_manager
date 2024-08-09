@@ -106,6 +106,6 @@ class User extends Authenticatable
 
     public function invitations(): HasMany
     {
-        return $this->hasMany(UserInvitation::class, 'coach_id');
+        return $this->hasMany(UsersInvitation::class, 'coach_id');
     }
 }

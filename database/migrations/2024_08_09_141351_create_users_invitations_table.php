@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_invitations', function (Blueprint $table) {
+        Schema::create('users_invitations', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class, 'coach_id');
             $table->string('email');
