@@ -12,11 +12,12 @@ Route::prefix('v1')->group(function () {
         Route::post('login', 'login');
     });
     Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('confirm-invitation', [UserController::class, 'confirmInvitation'])->name('users.confirm.invitation');
+
     Route::middleware('auth:api')->group(function () {
         Route::get('profile', [AuthController::class, 'profile']);
         Route::post('logout', [AuthController::class, 'logout']);
 
-        Route::get('confirm-invitation', [UserController::class, 'confirmInvitation'])->name('users.confirm.invitation');
         Route::apiResource('users', UserController::class, ['except' => 'index']);
 
     });

@@ -79,8 +79,27 @@ class UserController extends ApiController
         //
     }
 
-    public function confirmInvitation(Request $request, User $user)
+    /**
+     * @throws \Exception
+     */
+    public function confirmInvitation(Request $request)
     {
+        if (!$request->has('token')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Token not found',
+                'data' => null
+            ]);
+        }
+        $payload =  verifyToken($request->token);
+        $user = User::findOrFail($payload['user_id']);
 
+        $user->assignRole(Role::PLAYER);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User confirmed',
+            'data' => $user
+        ]);
     }
 }
