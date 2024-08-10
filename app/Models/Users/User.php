@@ -3,8 +3,10 @@
 namespace App\Models\Users;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Traits\GlobalTrait;
 use App\Observers\Users\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,18 +20,24 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $last_name
  * @property string $email
  * @property string $password
- * @property string $api_key
  * @property string $status
+ * @property int coach_id
  * @property string $image
  */
 #[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes, HasRoles, HasApiTokens;
+    use HasFactory, Notifiable, SoftDeletes, HasRoles, HasApiTokens, GlobalTrait;
 
-    public const STATUS_ACTIVE = '3';
-    public const STATUS_PENDING = '2';
-    public const STATUS_INACTIVE = '1';
+    public const STATUS_ACTIVE = 3;
+    public const STATUS_PENDING = 2;
+    public const STATUS_INACTIVE = 1;
+
+    public const GAME_POSITION_POINT_GUARD = 'PG';
+    public const GAME_POSITION_SHOOTING_GUARD = 'SG';
+    public const GAME_POSITION_SMALL_FORWARD = 'SF';
+    public const GAME_POSITION_POWER_FORWARD = 'PF';
+    public const GAME_POSITION_CENTER = 'C';
 
     /**
      * The attributes that are mass assignable.
@@ -37,7 +45,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'password', 'api_key', 'status', 'image', 'email_verified_at',
+        'first_name', 'last_name', 'email', 'password', 'status', 'image', 'email_verified_at', 'coach_id',
         'weight', 'height', 'game_position',
     ];
 
@@ -61,7 +69,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'status' => 'integer',
             'weight' => 'integer',
             'height' => 'integer',
         ];
@@ -71,6 +78,16 @@ class User extends Authenticatable
     {
         parent::boot();
 
+        static::addGlobalScope('orderDefault', function (Builder $builder) {
+            $builder
+                ->orderBy("first_name", "ASC")
+                ->orderBy("last_name", "ASC");
+
+        });
+//        static::addGlobalScope('withDefault', function (Builder $builder) {
+//            $builder->with(["roles"]);
+//        });
+
         static::saving(function ($user) {
            self::formatNames($user);
         });
@@ -78,15 +95,6 @@ class User extends Authenticatable
         static::creating(function ($user) {
             self::formatNames($user);
         });
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'email' => $this->email,
-        ];
     }
 
     protected static function formatNames(User $user): void
@@ -107,5 +115,40 @@ class User extends Authenticatable
     public function invitations(): HasMany
     {
         return $this->hasMany(UsersInvitation::class, 'coach_id');
+    }
+
+    public function players(): HasMany
+    {
+        return $this->hasMany(User::class, 'coach_id');
+    }
+
+    public function teammates(): HasMany
+    {
+        return $this
+            ->hasMany(User::class, 'coach_id', 'coach_id')
+            ->where('status', 3);
+    }
+
+
+    public static function getStatusName(int $status): string
+    {
+        return match ($status) {
+            self::STATUS_ACTIVE => 'Actif',
+            self::STATUS_PENDING => 'En attente',
+            self::STATUS_INACTIVE => 'Inactif',
+            default => 'Inconnu',
+        };
+    }
+
+    public static function getPositionName(string $position): string
+    {
+        return match ($position) {
+            self::GAME_POSITION_POINT_GUARD => 'Meneur',
+            self::GAME_POSITION_SHOOTING_GUARD => 'Arrière',
+            self::GAME_POSITION_SMALL_FORWARD => 'Ailier',
+            self::GAME_POSITION_POWER_FORWARD => 'Ailier fort',
+            self::GAME_POSITION_CENTER => 'Pivot',
+            default => 'Inconnu',
+        };
     }
 }

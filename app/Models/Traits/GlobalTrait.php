@@ -2,6 +2,7 @@
 
 namespace App\Models\Traits;
 
+use App\Models\Users\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -21,5 +22,38 @@ trait GlobalTrait
             return $query->whereIn($field, $value);
         }
         return $query->where($field, $value);
+    }
+
+    /**
+     * @description Cache les champs selon le rôle de l'utilisateur
+     *
+     * @return array
+     */
+    public static function hideFields(): array
+    {
+        $fields = [];
+        if (auth()->check()) {
+            $me = auth()->user();
+            if ($me->hasRole([Role::ADMINiSTRATOR, Role::COACH, Role::PLAYER])) {
+                $fields = [
+                    'password',
+                    'remember_token',
+                ];
+            }
+
+            if ($me->hasRole([Role::COACH, Role::PLAYER])) {
+                $fields = array_merge($fields, [ 'deleted_at', 'email_verified_at']);
+            }
+
+            if ($me->hasRole(Role::PLAYER)) {
+                $fields = array_merge($fields, [
+                    'status',
+                    'created_at',
+                    'updated_at',
+                ]);
+            }
+        }
+
+        return $fields;
     }
 }

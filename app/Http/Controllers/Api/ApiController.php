@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class ApiController
 {
@@ -21,4 +22,5 @@ class ApiController
         }
         return $model;
     }
+
 }
