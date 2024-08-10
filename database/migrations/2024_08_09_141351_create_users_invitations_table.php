@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class, 'coach_id');
             $table->string('email');
-            $table->string('token');
+            $table->text('token');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_invitations');
+        Schema::dropIfExists('users_invitations');
     }
 };

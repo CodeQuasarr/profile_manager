@@ -3,13 +3,10 @@
 namespace App\Observers\Users;
 
 
-use App\Http\Controllers\Api\v1\MailController;
 use App\Jobs\Mails\SendAccountCreationSuccessNotificationJob;
 use App\Models\Users\Role;
 use App\Models\Users\User;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Str;
+use App\Models\Users\UsersInvitation;
 
 class UserObserver
 {
@@ -38,6 +35,12 @@ class UserObserver
                     "Invitation à rejoindre l'équipe en ligne sur Basket Fusion",
                     $contents
                 );
+
+                UsersInvitation::create([
+                    'coach_id' => $me->getKey(),
+                    'email' => $user->email,
+                    'token' => $confirmationToken,
+                ]);
             }
         }
     }

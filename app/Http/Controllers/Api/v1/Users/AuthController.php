@@ -60,16 +60,11 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        // Assigner une clé API unique pour les Coachs
-        // Elle sera Modifier plus tard lorsque le système de paiement sera mis en place
-        $apiKey = hash('sha256', uniqid());
-
         $user = new User([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'api_key' => $apiKey,
             'status' => User::STATUS_ACTIVE,
         ]);
 

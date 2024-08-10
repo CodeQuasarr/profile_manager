@@ -12,13 +12,14 @@ Route::prefix('v1')->group(function () {
         Route::post('login', 'login');
     });
 
-    Route::get('users', [UserController::class, 'index'])->name('users.index');
-    Route::get('confirm-invitation', [UsersInvitationController::class, 'confirmInvitation'])->name('users.confirm.invitation');
+    Route::get('users-guest', [UserController::class, 'indexForGuest'])->name('users.index.guest');
+    Route::post('confirm-invitation', [UsersInvitationController::class, 'confirmInvitation'])->name('users.confirm.invitation');
 
+    Route::apiResource('users', UserController::class)->only(['index']);
     Route::middleware('auth:api')->group(function () {
         Route::get('profile', [AuthController::class, 'profile']);
         Route::post('logout', [AuthController::class, 'logout']);
-        Route::apiResource('users', UserController::class, ['except' => 'index']);
+        Route::apiResource('users', UserController::class);
 
     });
 });
