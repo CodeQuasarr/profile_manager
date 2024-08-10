@@ -44,8 +44,16 @@ class deploy extends Command
         shell_exec("composer install");
         $this->line("");
 
+        // verifier si l fichier config/app existe
+        if (!file_exists(config_path('query-builder.php'))) {
+            $this->alert("publier le fichier de configuration des filtres de recherche");
+            $this->call("vendor:publish", ["--provider" => "Spatie\QueryBuilder\QueryBuilderServiceProvider", "--tag" => "query-builder-config"]);
+            $this->line("");
+        }
+
         $this->alert("Mise à jour des rôles et des permissions");
         $this->call("roles-and-permissions-updated");
         $this->line("");
+
     }
 }

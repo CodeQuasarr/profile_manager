@@ -11,6 +11,7 @@ use App\Models\Users\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use JetBrains\PhpStorm\NoReturn;
 
@@ -30,15 +31,20 @@ class UserController extends ApiController
             ]);
         }
 
-        $users = User::all();
         $me = Auth::user();
+        $query = QueryBuilder::for(User::class);
 
         if ($me->hasRole(Role::COACH)) {
-            $users = $me->players;
+            $query = $query = QueryBuilder::for(User::class);
         } elseif ($me->hasRole(Role::PLAYER)) {
-            $users = $me->teammates;
+            $query = QueryBuilder::for($me->teammates());
         }
+
+        $users = $query
+            ->allowedFields('name')
+            ->get();
         $users->makeHidden(User::hideFields());
+
         return response()->json([
             'status' => true,
             'message' => 'Users list',
@@ -54,7 +60,10 @@ class UserController extends ApiController
      */
     public function indexForGuest(): JsonResponse
     {
-        $users = User::all();
+        $users = QueryBuilder::for(User::class)
+            ->allowedFilters(['first_name', 'email'])
+            ->get();
+
         $users->makeHidden([
             'id',
             'email',
