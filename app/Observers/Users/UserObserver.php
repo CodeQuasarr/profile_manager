@@ -5,7 +5,6 @@ namespace App\Observers\Users;
 
 use App\Jobs\Mails\SendAccountCreationSuccessNotificationJob;
 use App\Lib\TheCurrent;
-use App\Models\Users\Role;
 use App\Models\Users\User;
 use App\Models\Users\UsersInvitation;
 
@@ -18,12 +17,24 @@ class UserObserver
     public function created(User $user): void
     {
         // Envoyer un email de bienvenue lorsqu'un utilisateur (coach) est créé.
-
         if (!TheCurrent::user()) {
             $contents = [
                 'name' => $user->getName(),
             ];
             SendAccountCreationSuccessNotificationJob::dispatch($user->email, 'mails.successCreation', 'Bienvenue sur la plateforme Basket Fusion', $contents);
+        }
+
+        // Envoyer un email de confirmation de compte
+        if (!TheCurrent::user()) {
+            $contents = [
+                'name' => $user->getName(),
+            ];
+            SendAccountCreationSuccessNotificationJob::dispatch(
+                $user->email,
+                'mails.successCreation',
+                'Bienvenue sur la plateforme Basket Fusion',
+                $contents
+            );
         }
 
         // Email the user when a coach creates an account for him.

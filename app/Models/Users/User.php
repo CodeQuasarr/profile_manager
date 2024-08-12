@@ -17,13 +17,45 @@ use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
- * @property string $first_name
- * @property string $last_name
- * @property string $email
- * @property string $password
- * @property string $status
- * @property int coach_id
- * @property string $image
+ * @OA\Schema(
+ *     schema="User",
+ *     type="object",
+ *     title="User",
+ *     description="User model",
+ *     @OA\Property(
+ *         property="id",
+ *         type="integer",
+ *         description="The ID of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="first_name",
+ *         type="string",
+ *         description="The first name of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="last_name",
+ *         type="string",
+ *         description="The last name of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="email",
+ *         type="string",
+ *         format="email",
+ *         description="The email address of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="created_at",
+ *         type="string",
+ *         format="date-time",
+ *         description="The date and time the user was created"
+ *     ),
+ *     @OA\Property(
+ *         property="updated_at",
+ *         type="string",
+ *         format="date-time",
+ *         description="The date and time the user was last updated"
+ *     ),
+ * )
  */
 #[ObservedBy([UserObserver::class])]
 class User extends Authenticatable

@@ -53,6 +53,9 @@ class deploy extends Command
             $this->call("vendor:publish", ["--provider" => "Spatie\QueryBuilder\QueryBuilderServiceProvider", "--tag" => "query-builder-config"]);
             $this->line("");
         }
+        $this->alert("Mise à jour de la documentation API");
+        $this->call("vendor:publish", ["--provider" => "L5Swagger\L5SwaggerServiceProvider"]);
+        $this->line("");
 
         $this->alert("Mise à jour des rôles et des permissions");
         $this->call("roles-and-permissions-updated");
