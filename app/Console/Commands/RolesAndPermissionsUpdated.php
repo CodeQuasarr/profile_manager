@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Users\Permission;
 use App\Models\Users\Role;
+use App\Models\Users\User;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -31,21 +32,21 @@ class RolesAndPermissionsUpdated extends Command
      */
     public function handle()
     {
-        // Désactiver les contraintes de clé étrangère pour éviter les problèmes lors de la troncature des tables
-        // Désactiver temporairement la protection contre l'assignation de masse sur le modèle
+        // Disable foreign key constraints to avoid problems when truncating tables
+        // Temporarily disable mass assignment protection on the model
         Schema::disableForeignKeyConstraints();
         Model::unguard();
 
-        // Tronquer les tables spécifiées pour supprimer tous les enregistrements existants
+        // Truncate specified tables to delete all existing records
         $this->truncate("model_has_permissions");
         $this->truncate("permissions");
 
-        // Réactiver la protection contre l'assignation de masse sur le modèle
-        // Réactiver les contraintes de clé étrangère après la troncature des tables
+        // Reactivate protection against mass assignment on the model
+        // Re-enable foreign key constraints after table truncation
         Model::reguard();
         Schema::enableForeignKeyConstraints();
 
-        // Mettre à jour les rôles et les permissions
+        // Update roles and permissions
         $this->updateRoles();
         $this->updatePermissions();
 
@@ -56,9 +57,13 @@ class RolesAndPermissionsUpdated extends Command
         $bar->start();
 
         foreach ($roles as $name => $description) {
-            $this->synchroneRolesPermissions($name);
+            $this->synchronizeRolesPermissions($name);
             $bar->advance();
         }
+
+        $this->info('');
+        $this->addRoleToUser();
+
         $bar->finish();
         $this->info('');
         $this->info('');
@@ -67,11 +72,10 @@ class RolesAndPermissionsUpdated extends Command
     }
 
     /**
-     * @description Met à jour les rôles dans la base de données.
-     *
-     * Cette méthode récupère les rôles statiques de la classe Role
-     * et les compare avec les rôles actuels dans la base de données.
-     * Les nouveaux rôles sont ajoutés et les anciens sont mis à jour.
+     * @description Updates roles in the database.
+     * * This method retrieves static roles from the Role
+     * * class and compares them with the current roles in the database.
+     * * New roles are added and old roles are updated.
      *
      * @return void
      */
@@ -97,11 +101,10 @@ class RolesAndPermissionsUpdated extends Command
     }
 
     /**
-     * @description Met à jour les permissions dans la base de données.
-     *
-     * Cette méthode récupère les permissions statiques de la classe Permission
-     * et les compare avec les permissions actuelles dans la base de données.
-     * Les nouvelles permissions sont ajoutées et les anciennes sont mises à jour.
+     * @description Updates permissions in the database.
+     * This method retrieves static permissions from the Permission
+     * class and compares them with the current permissions in the database.
+     * New permissions are added and old ones are updated.
      *
      * @return void
      */
@@ -126,15 +129,14 @@ class RolesAndPermissionsUpdated extends Command
     }
 
     /**
-     * @description Synchronise les permissions pour un rôle donné.
-     *
-     *  Cette méthode révoque toutes les permissions actuelles du rôle spécifié,
-     *  puis attribue les nouvelles permissions basées sur la configuration.
+     * @description Synchronizes permissions for a given role.
+     * This method revokes all current permissions for the specified role,
+     * then assigns new permissions based on configuration.
      *
      * @param string $roleName
      * @return void
      */
-    private function synchroneRolesPermissions(string $roleName): void
+    private function synchronizeRolesPermissions(string $roleName): void
     {
         $this->info("Permissions -> Role : $roleName");
 
@@ -151,7 +153,35 @@ class RolesAndPermissionsUpdated extends Command
     }
 
     /**
-     * Truncate a table with foreign key checks disabled and re-enabling them afterwards. This is useful for truncating tables
+     * @description Assigns roles to all fictitious users.
+     *
+     * @return void
+     */
+    public function addRoleToUser()
+    {
+        $administrator = User::find(1);
+        $administrator->assignRole(Role::ADMINiSTRATOR);
+        $this->info("Role 'administrateur' ajouté à l'utilisateur ". $administrator->getName());
+
+        $coach = User::query()
+            ->whereNull('coach_id')
+            ->where('id', '!=', $administrator->getKey());
+
+        $coach->each(function ($coach) {
+            $coach->assignRole(Role::COACH);
+            $this->info("Role 'coach' ajouté à l'utilisateur ". $coach->getName());
+        });
+
+        $players = User::query()->whereNotNull('coach_id');
+        $players->each(function ($player) {
+            $player->assignRole(Role::PLAYER);
+            $this->info("Role 'joueur' ajouté à l'utilisateur ". $player->getName());
+        });
+    }
+
+    /**
+     * @description Truncate a table with foreign key checks disabled and re-enabling them afterwards. This is useful for truncating tables
+
      * @param $table
      * @return bool
      */

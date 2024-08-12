@@ -40,6 +40,9 @@ class deploy extends Command
         $this->alert('Migrations');
         $this->call('migrate', ['--force' => true, '--vvv']);
 
+        $this->alert('Lancer les seeders');
+        $this->call('db:seed');
+
         $this->alert('Mise à jour des dépendances');
         shell_exec("composer install");
         $this->line("");
