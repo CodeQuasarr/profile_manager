@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\Mail;
 class MailController extends Controller
 {
     /**
-     * @description Envoie un mail de confirmation de création de compte au nouvel utilisateur avec le Role de coach.
+     * @description Sends an account creation confirmation e-mail to the new user with the Coach Role
      * @param string $email
      * @param string $viewPath
      * @param string $theSubject
-     * @param string $mailContents
+     * @param array $mailContents
      * @return void | JsonResponse
      */
     public static function sendSuccessfulAccountCreation(string $email, string $viewPath, string $theSubject, array $mailContents = [])

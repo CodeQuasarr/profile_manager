@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 trait GlobalTrait
 {
     /**
-     * @description Scope pour filtrer les données par champ et valeur
+     * @description Scope to filter data by field and value
      *
      * @param Builder $query
      * @param string $field
@@ -25,7 +25,7 @@ trait GlobalTrait
     }
 
     /**
-     * @description Cache les champs selon le rôle de l'utilisateur
+     * @description Hide fields according to user role
      *
      * @return array
      */

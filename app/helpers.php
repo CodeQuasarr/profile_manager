@@ -20,10 +20,10 @@ if (!function_exists('generateToken')) {
             'expires_at' => $expiresAt->toDateTimeString(),
         ]);
 
-        // Chiffrement du payload pour sécuriser le payload lors de l'envoi du token
+        // Payload encryption to secure the payload when sending the token
         $encryptedPayload = Crypt::encryptString($payloadJson);
 
-        // Signature du token
+        // Token signature
         $secretKey = config('app.token_secret_key');
         $signature = hash_hmac('sha256', $encryptedPayload, $secretKey);
 

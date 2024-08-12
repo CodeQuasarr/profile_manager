@@ -4,8 +4,6 @@ namespace App\Helpers;
 
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class ApiResponse
@@ -29,7 +27,7 @@ class ApiResponse
                 'status' => false,
                 'code' => ResponseAlias::HTTP_UNAUTHORIZED,
                 "message" => "Identifiants incorrects.",
-                "details" => "Sssurez-vous que vous avez entré les bonnes informations d'identification"
+                "details" => "Assurez-vous que vous avez entré les bonnes informations d'identification"
             ], ResponseAlias::HTTP_UNAUTHORIZED);
     }
 

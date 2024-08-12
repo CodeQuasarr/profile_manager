@@ -16,7 +16,7 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        // Envoyer un email de bienvenue lorsqu'un utilisateur (coach) est créé.
+        // Email when a user (coach) is created
         if (!TheCurrent::user()) {
             $contents = [
                 'name' => $user->getName(),
@@ -24,7 +24,7 @@ class UserObserver
             SendAccountCreationSuccessNotificationJob::dispatch($user->email, 'mails.successCreation', 'Bienvenue sur la plateforme Basket Fusion', $contents);
         }
 
-        // Envoyer un email de confirmation de compte
+        // Email to confirm
         if (!TheCurrent::user()) {
             $contents = [
                 'name' => $user->getName(),

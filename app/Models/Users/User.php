@@ -62,6 +62,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes, HasRoles, HasApiTokens, GlobalTrait;
 
+    /* CONSTANTS
+    \**************************************************************************/
     public const STATUS_ACTIVE = 3;
     public const STATUS_PENDING = 2;
     public const STATUS_INACTIVE = 1;
@@ -136,14 +138,8 @@ class User extends Authenticatable
         $user->first_name = ucfirst($user->first_name);
     }
 
-    /**
-     * @description Recupère le nom complet de l'utilisateur.
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->first_name . ' ' . $this->last_name;
-    }
+    /* RELATIONS
+   \**************************************************************************/
 
     public function invitations(): HasMany
     {
@@ -162,28 +158,8 @@ class User extends Authenticatable
             ->where('status', 3);
     }
 
-
-    public static function getStatusName(int $status): string
-    {
-        return match ($status) {
-            self::STATUS_ACTIVE => 'Actif',
-            self::STATUS_PENDING => 'En attente',
-            self::STATUS_INACTIVE => 'Inactif',
-            default => 'Inconnu',
-        };
-    }
-
-    public static function getPositionName(string $position): string
-    {
-        return match ($position) {
-            self::GAME_POSITION_POINT_GUARD => 'Meneur',
-            self::GAME_POSITION_SHOOTING_GUARD => 'Arrière',
-            self::GAME_POSITION_SMALL_FORWARD => 'Ailier',
-            self::GAME_POSITION_POWER_FORWARD => 'Ailier fort',
-            self::GAME_POSITION_CENTER => 'Pivot',
-            default => 'Inconnu',
-        };
-    }
+    /* SCOPES
+    \**************************************************************************/
 
     /**
      * @description Scope a query to include only users that belong to the logged-in user's team.
@@ -210,6 +186,32 @@ class User extends Authenticatable
         return $query;
     }
 
+    /* METHODS
+    \**************************************************************************/
+
+    public static function getStatusName(int $status): string
+    {
+        return match ($status) {
+            self::STATUS_ACTIVE => 'Actif',
+            self::STATUS_PENDING => 'En attente',
+            self::STATUS_INACTIVE => 'Inactif',
+            default => 'Inconnu',
+        };
+    }
+
+    public static function getPositionName(string $position): string
+    {
+        return match ($position) {
+            self::GAME_POSITION_POINT_GUARD => 'Meneur',
+            self::GAME_POSITION_SHOOTING_GUARD => 'Arrière',
+            self::GAME_POSITION_SMALL_FORWARD => 'Ailier',
+            self::GAME_POSITION_POWER_FORWARD => 'Ailier fort',
+            self::GAME_POSITION_CENTER => 'Pivot',
+            default => 'Inconnu',
+        };
+    }
+
+
     public function isAdminiStrator(): bool
     {
         return $this->hasRole(Role::ADMINISTRATOR);
@@ -225,9 +227,19 @@ class User extends Authenticatable
         return $this->hasRole(Role::PLAYER);
     }
 
-
     public static function getImageUrl(string $imageName): string
     {
         return asset('storage/images/' . $imageName);
+    }
+
+
+
+    /**
+     * @description Recupère le nom complet de l'utilisateur.
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->first_name . ' ' . $this->last_name;
     }
 }

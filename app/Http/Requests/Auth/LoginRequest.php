@@ -54,7 +54,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * @description Vérifie sil'utilisateur n'a pas dépassé la limite de tentatives de connexion.
+     * @description Checks if the user has not exceeded the limit of login attempts.
      *
      * @throws ValidationException
      */
