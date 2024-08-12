@@ -58,8 +58,22 @@ php artisan test
 - Attribution des rôles aux utilisateurs
 - Installation d'autre dépendances nécessaires
 
+### 7. Configurer l'envoi de mails
+###### Remplissez les éléments nécessaires pour l'envoi de mails dans le fichier `.env`
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.example.com
+MAIL_PORT=587
+MAIL_USERNAME=your_username
+MAIL_PASSWORD=your_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=your_email@example.com
+MAIL_FROM_NAME="${APP_NAME}"
 
-### 7. Documentation API (Swagger)
+APP_TOKEN_SECRET_KEY=your_secure_token
+```
+
+### 8. Documentation API (Swagger)
 ###### La documentation de l'API est générée avec Swagger. Pour y accéder, démarrez l'application et rendez-vous à l'URL suivante
 ```bash
 http://localhost:8000/api/documentation
