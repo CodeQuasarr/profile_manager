@@ -18,7 +18,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole([Role::COACH, Role::PLAYER, Role::ADMINiSTRATOR]);
+        return $user->hasRole([Role::COACH, Role::PLAYER, Role::ADMINISTRATOR]);
     }
 
     /**
@@ -26,7 +26,10 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return false;
+        if ($user->hasRole(Role::ADMINISTRATOR)) {
+            return true;
+        }
+        return !$model->hasRole(Role::ADMINISTRATOR);
     }
 
     /**
@@ -34,7 +37,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole([Role::COACH, Role::ADMINiSTRATOR]);
+        return $user->hasRole([Role::COACH, Role::ADMINISTRATOR]);
     }
 
     /**
@@ -42,7 +45,12 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->hasRole([Role::COACH, Role::ADMINiSTRATOR]) || $user->getKey() == $model->getKey();
+        if ($user->hasRole([Role::ADMINISTRATOR, Role::COACH])) {
+            return $this->view($user, $model);
+        } elseif ($user->hasRole(Role::PLAYER)) {
+            return $user->getKey() === $model->getKey();
+        }
+        return false;
     }
 
     /**
@@ -50,7 +58,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->hasRole([Role::COACH, Role::ADMINiSTRATOR]);
+        return $user->hasRole([Role::COACH, Role::ADMINISTRATOR]);
     }
 
     /**
@@ -58,7 +66,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->hasRole([Role::ADMINiSTRATOR]);
+        return $user->hasRole(Role::ADMINISTRATOR);
     }
 
     /**
@@ -66,6 +74,6 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return $user->hasRole([Role::ADMINiSTRATOR]);
+        return $user->hasRole(Role::ADMINISTRATOR);
     }
 }

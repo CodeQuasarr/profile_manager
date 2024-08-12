@@ -25,4 +25,12 @@ class UserCollection extends ResourceCollection
             return $item;
         })->toArray();
     }
+
+    public function with($request)
+    {
+        return [
+            'status' => true,
+            'message' => 'Liste des utilisateurs',
+        ];
+    }
 }

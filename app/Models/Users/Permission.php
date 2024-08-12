@@ -48,7 +48,7 @@ class Permission extends SpatiePermission
     public static function static_getPermissionsByRoleName(string $roleName): array|Collection|null
     {
         return match ($roleName) {
-            Role::ADMINiSTRATOR => self::all(),
+            Role::ADMINISTRATOR => self::all(),
             Role::COACH => self::static_getPermissions_coach(),
             Role::PLAYER => self::static_getPermissions_player(),
             default => null,

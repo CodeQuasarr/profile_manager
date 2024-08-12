@@ -62,6 +62,11 @@ class RolesAndPermissionsUpdated extends Command
         }
 
         $this->info('');
+        $userCount = User::count();
+        if ($userCount === 0) {
+            $this->info('Aucun utilisateur fictif trouvé');
+            return;
+        }
         $this->addRoleToUser();
 
         $bar->finish();
@@ -160,7 +165,7 @@ class RolesAndPermissionsUpdated extends Command
     public function addRoleToUser()
     {
         $administrator = User::find(1);
-        $administrator->assignRole(Role::ADMINiSTRATOR);
+        $administrator->assignRole(Role::ADMINISTRATOR);
         $this->info("Role 'administrateur' ajouté à l'utilisateur ". $administrator->getName());
 
         $coach = User::query()

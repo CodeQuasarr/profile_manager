@@ -8,6 +8,7 @@ use App\Observers\Users\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -119,7 +120,7 @@ class User extends Authenticatable
 
     public function players(): HasMany
     {
-        return $this->hasMany(User::class, 'coach_id');
+        return $this->loggedUserTeam()->hasMany(User::class, 'coach_id');
     }
 
     public function teammates(): HasMany
@@ -150,5 +151,45 @@ class User extends Authenticatable
             self::GAME_POSITION_CENTER => 'Pivot',
             default => 'Inconnu',
         };
+    }
+
+    /**
+     * @description Scope a query to include only users that belong to the logged-in user's team.
+     * If the logged-in user has the role of COACH or PLAYER, exclude users with the ADMIN role.
+     * Otherwise, exclude users with the ADMIN and COACH roles and filter by active status.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeLoggedUserTeam(Builder $query): Builder
+    {
+        if ($this->hasRole([Role::COACH, Role::PLAYER])) {
+            $query->whereDoesntHave('roles', function ($query) {
+                $query->where('name', Role::ADMINISTRATOR);
+            });
+            if ($this->hasRole(Role::PLAYER)) {
+                $query->where('status', self::STATUS_ACTIVE);
+            }
+        } else {
+            $query->whereDoesntHave('roles', function ($query) {
+                $query->whereIn('name', [Role::ADMINISTRATOR, Role::COACH]);
+            })->fieldValue('status', self::STATUS_ACTIVE);
+        }
+        return $query;
+    }
+
+    public function isAdminiStrator(): bool
+    {
+        return $this->hasRole(Role::ADMINISTRATOR);
+    }
+
+    public function isCoach(): bool
+    {
+        return $this->hasRole(Role::COACH);
+    }
+
+    public function isPlayer(): bool
+    {
+        return $this->hasRole(Role::PLAYER);
     }
 }

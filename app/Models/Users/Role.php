@@ -11,7 +11,7 @@ class Role extends SpatieRole
 
     /* CONSTANTS
     \**************************************************************************/
-    public const ADMINiSTRATOR = "administrator";
+    public const ADMINISTRATOR = "administrator";
     public const COACH = "coach";
     public const PLAYER = "player";
 
@@ -26,7 +26,7 @@ class Role extends SpatieRole
     public static function static_getRoles(): Collection
     {
         return new Collection([
-            self::ADMINiSTRATOR => __("roles.role_names.administrator"),
+            self::ADMINISTRATOR => __("roles.role_names.administrator"),
             self::COACH         => __("roles.role_names.coach"),
             self::PLAYER        => __("roles.role_names.player"),
         ]);

@@ -4,6 +4,7 @@ namespace App\Observers\Users;
 
 
 use App\Jobs\Mails\SendAccountCreationSuccessNotificationJob;
+use App\Lib\TheCurrent;
 use App\Models\Users\Role;
 use App\Models\Users\User;
 use App\Models\Users\UsersInvitation;
@@ -12,51 +13,42 @@ class UserObserver
 {
 
     /**
-     * Handle the User "saving" event.
-     */
-    public function saved(User $user)
-    {
-        // Un coach crée le profil d'un de ses joueurs
-        if (auth()->check()) {
-            $me = auth()->user();
-            if ($me->hasRole(Role::COACH)) {
-                $confirmationToken = generateToken($user->getKey());
-                $url = route('users.confirm.invitation', ['token' => $confirmationToken]);
-
-                $contents = [
-                    'club' => 'LDLC ASVEL', // plus tard :  $me->club->name
-                    'name' => $me->getName(),
-                    'url' => $url,
-                ];
-
-                SendAccountCreationSuccessNotificationJob::dispatch(
-                    $user->email,
-                    'mails.confirmationInvitation',
-                    "Invitation à rejoindre l'équipe en ligne sur Basket Fusion",
-                    $contents
-                );
-
-                UsersInvitation::create([
-                    'coach_id' => $me->getKey(),
-                    'email' => $user->email,
-                    'token' => $confirmationToken,
-                ]);
-            }
-        }
-    }
-
-    /**
      * Handle the User "created" event.
      */
     public function created(User $user): void
     {
         // Envoyer un email de bienvenue lorsqu'un utilisateur (coach) est créé.
 
-        if (!auth()->check()) {
+        if (!TheCurrent::user()) {
             $contents = [
                 'name' => $user->getName(),
             ];
             SendAccountCreationSuccessNotificationJob::dispatch($user->email, 'mails.successCreation', 'Bienvenue sur la plateforme Basket Fusion', $contents);
+        }
+
+        // Email the user when a coach creates an account for him.
+        if (TheCurrent::user() && TheCurrent::user()->isCoach()) {
+            $confirmationToken = generateToken($user->getKey());
+            $url = route('users.confirm.invitation', ['token' => $confirmationToken]);
+
+            $contents = [
+                'club' => 'LDLC ASVEL', //TODO plus tard :  $me->club->name
+                'name' => TheCurrent::user()->getName(),
+                'url' => $url,
+            ];
+
+            SendAccountCreationSuccessNotificationJob::dispatch(
+                $user->email,
+                'mails.confirmationInvitation',
+                "Invitation à rejoindre l'équipe en ligne sur Basket Fusion",
+                $contents
+            );
+
+            UsersInvitation::create([
+                'coach_id' => TheCurrent::user()->getKey(),
+                'email' => $user->email,
+                'token' => $confirmationToken,
+            ]);
         }
     }
 

@@ -34,7 +34,7 @@ trait GlobalTrait
         $fields = [];
         if (auth()->check()) {
             $me = auth()->user();
-            if ($me->hasRole([Role::ADMINiSTRATOR, Role::COACH, Role::PLAYER])) {
+            if ($me->hasRole([Role::ADMINISTRATOR, Role::COACH, Role::PLAYER])) {
                 $fields = [
                     'password',
                     'remember_token',
