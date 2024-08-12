@@ -40,7 +40,7 @@ class UserObserver
         // Email the user when a coach creates an account for him.
         if (TheCurrent::user() && TheCurrent::user()->isCoach()) {
             $confirmationToken = generateToken($user->getKey());
-            $url = route('users.confirm.invitation', ['token' => $confirmationToken]);
+            $url = route('users.confirm.invitation', ['token' => urlencode($confirmationToken)]);
 
             $contents = [
                 'club' => 'LDLC ASVEL', //TODO plus tard :  $me->club->name

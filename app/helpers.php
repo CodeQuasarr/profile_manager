@@ -20,15 +20,20 @@ if (!function_exists('generateToken')) {
             'expires_at' => $expiresAt->toDateTimeString(),
         ]);
 
-        // Payload encryption to secure the payload when sending the token
-        $encryptedPayload = Crypt::encryptString($payloadJson);
+        $header = json_encode([
+            'alg' => 'HS256',
+            'typ' => 'JWT'
+        ]);
 
-        // Token signature
-        $secretKey = config('app.token_secret_key');
-        $signature = hash_hmac('sha256', $encryptedPayload, $secretKey);
+        // Encode the header and payload to base64
+        $headerEncoded = rtrim(strtr(base64_encode($header), '+/', '-_'), '=');
+        $payloadEncoded = rtrim(strtr(base64_encode($payloadJson), '+/', '-_'), '=');
 
-        // Construction du token final
-        return base64_encode($encryptedPayload . '.' . $signature);
+        // Generate the signature
+        $signature = hash_hmac('sha256', "$headerEncoded.$payloadEncoded", config('app.token_secret_key'), true);
+        $signatureEncoded = rtrim(strtr(base64_encode($signature), '+/', '-_'), '=');
+
+        return "$headerEncoded.$payloadEncoded.$signatureEncoded";
     }
 
 }
@@ -41,22 +46,25 @@ if (!function_exists('verifyToken')) {
      */
     function verifyToken(string $token): mixed
     {
-        // Décodage du token
-        $decodedToken = base64_decode($token);
-        [$encryptedPayload, $signature] = explode('.', $decodedToken);
+        // Split the token into its three parts
+        list($headerEncoded, $payloadEncoded, $signatureEncoded) = explode('.', $token);
 
-        if (!$encryptedPayload || !$signature) {
-            throw new \Exception('le token est invalide');
+        $signature = base64_decode(strtr($signatureEncoded, '-_', '+/'));
+        $expectedSignature = hash_hmac('sha256', "$headerEncoded.$payloadEncoded", config('app.token_secret_key'), true);
+
+        // Check if the provided signature matches the expected signature
+        if ($signature !== $expectedSignature) {
+            throw new Exception('Signature invalide');
         }
 
-        $secretKey = config('app.token_secret_key');
-        $expectedSignature = hash_hmac('sha256', $encryptedPayload, $secretKey);
+        $payload = base64_decode(strtr($payloadEncoded, '-_', '+/'));;
+        $data = json_decode($payload, true);
 
-        // Vérification de la signature
-        if (!hash_equals($expectedSignature, $signature)) {
-            throw new \Exception('La signature du token est invalide');
+        if ($data['expires_at'] < time()) {
+            throw new Exception('Le token a expiré');
         }
-        return json_decode(Crypt::decryptString($encryptedPayload), true);
+
+        return $data;
     }
 }
 

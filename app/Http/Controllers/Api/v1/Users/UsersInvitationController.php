@@ -192,8 +192,8 @@ class UsersInvitationController extends Controller
             $invitation = UsersInvitation::query()->fieldValue('token', $request->token)->first();
 
             if (is_null($invitation)) {
-                Log::error('Invitation not found');
-                return ApiResponse::return400('Invitation expired or invalid');
+                Log::error('L\'invitation n\'a pas été trouvée');
+                return ApiResponse::return400('L\'invitation a expiré ou est invalide');
             }
 
             $user = User::findOrFail($payload['user_id']);
@@ -210,7 +210,7 @@ class UsersInvitationController extends Controller
             $user->assignRole(Role::PLAYER);
 
             if (!$success) {
-                return ApiResponse::return500('ccUne erreur est survenue lors de la confirmation de l\'invitation');
+                return ApiResponse::return500('Une erreur est survenue lors de la confirmation de l\'invitation');
             }
 
             $invitation->delete();
