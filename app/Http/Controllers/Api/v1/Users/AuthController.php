@@ -76,7 +76,7 @@ class AuthController extends Controller
     /**
      * @OA\Get(
      *     path="/api/v1/profile",
-     *     tags={"Authentication"},
+     *     tags={"Profile"},
      *     summary="User profile",
      *     description="User profile",
      *     operationId="show",
@@ -173,6 +173,7 @@ class AuthController extends Controller
      *     path="/api/v1/logout",
      *     summary="Déconnecte l'utilisateur",
      *     description="Révoque le jeton d'accès de l'utilisateur connecté.",
+     *     security={{"bearer":{}}},
      *     operationId="logoutUser",
      *     tags={"Authentification"},
      *     @OA\RequestBody(

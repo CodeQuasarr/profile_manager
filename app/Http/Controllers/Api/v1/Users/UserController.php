@@ -27,33 +27,27 @@ class UserController extends ApiController
      *     tags={"User"},
      *     security={{"bearer":{}}},
      *     @OA\Parameter(
-     *         name="first_name",
+     *         name="filter[first_name]",
+     *         in="query",
+     *         example="emelie",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         description="Filtrer les utilisateurs par prénom"
+     *     ),
+     *     @OA\Parameter(
+     *         name="filter[lst_name]",
      *         in="query",
      *         required=false,
      *         @OA\Schema(type="string"),
-     *         description="Filter users by first name"
+     *         description="Filtrer les utilisateurs par nom"
      *     ),
      *     @OA\Parameter(
-     *         name="last_name",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Filter users by last name"
-     *     ),
-     *     @OA\Parameter(
-     *         name="email",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Filter users by email"
-     *     ),
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"active", "inactive"}),
-     *         description="Filter users by status ('active' or 'inactive')"
-     *     ),
+     *          name="filter[status]",
+     *          in="query",
+     *          required=false,
+     *          @OA\Schema(type="inumber", enum={"--", "active", "inactive", "Supprimer"}),
+     *          description="Filter users by status ('active' or 'inactive')"
+     *      ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -84,7 +78,7 @@ class UserController extends ApiController
         }
 
         $users = $query
-            ->allowedFilters(['first_name', 'email'])
+            ->allowedFilters(['first_name', 'last_name', 'status'])
             ->paginate(5)
             ->appends(request()->query());
 
@@ -106,33 +100,20 @@ class UserController extends ApiController
      *     operationId="getGuestUsers",
      *     tags={"User"},
      *     @OA\Parameter(
-     *         name="first_name",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Filter users by first name"
-     *     ),
-     *     @OA\Parameter(
-     *         name="last_name",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Filter users by last name"
-     *     ),
-     *     @OA\Parameter(
-     *         name="email",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Filter users by email"
-     *     ),
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"active", "inactive"}),
-     *         description="Filter users by status ('active' or 'inactive')"
-     *     ),
+     *          name="filter[first_name]",
+     *          in="query",
+     *          example="emelie",
+     *          required=false,
+     *          @OA\Schema(type="string"),
+     *          description="Filtrer les utilisateurs par prénom"
+     *      ),
+     *      @OA\Parameter(
+     *          name="filter[last_name]",
+     *          in="query",
+     *          required=false,
+     *          @OA\Schema(type="string"),
+     *          description="Filtrer les utilisateurs par nom"
+     *      ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -147,11 +128,11 @@ class UserController extends ApiController
      *     )
      * )
      */
-    public function indexForGuest(): UserCollection
+    public function indexForGuest(Request $request): UserCollection
     {
         $query = QueryBuilder::for(User::query()->loggedUserTeam());
         $users = $query
-            ->allowedFilters(['first_name', 'email'])
+            ->allowedFilters(['first_name', 'last_name'])
             ->paginate(5)
             ->appends(request()->query());
 

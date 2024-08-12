@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\v1\Users\AuthController;
 use App\Http\Controllers\Api\v1\Users\UserController;
 use App\Http\Controllers\Api\v1\Users\UsersInvitationController;
+use App\Http\Middleware\ReformatQueryParameters;
 use Illuminate\Support\Facades\Route;
 
 
@@ -12,7 +13,9 @@ Route::prefix('v1')->group(function () {
         Route::post('login', 'login');
     });
 
-    Route::get('users-guest', [UserController::class, 'indexForGuest'])->name('users.index.guest');
+    Route::middleware(ReformatQueryParameters::class)->group(function () {
+        Route::get('users-guest', [UserController::class, 'indexForGuest'])->name('users.index.guest');
+    });
     Route::post('confirm-invitation', [UsersInvitationController::class, 'confirmInvitation'])->name('users.confirm.invitation');
 
     Route::apiResource('users', UserController::class)->only(['index']);

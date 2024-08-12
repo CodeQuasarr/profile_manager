@@ -103,7 +103,7 @@
         "/api/v1/profile": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Profile"
                 ],
                 "summary": "User profile",
                 "description": "User profile",
@@ -285,7 +285,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
             }
         },
         "/api/v1/users": {
@@ -298,42 +303,36 @@
                 "operationId": "getUsers",
                 "parameters": [
                     {
-                        "name": "first_name",
+                        "name": "filter[first_name]",
                         "in": "query",
-                        "description": "Filter users by first name",
+                        "description": "Filtrer les utilisateurs par prénom",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "emelie"
+                    },
+                    {
+                        "name": "filter[lst_name]",
+                        "in": "query",
+                        "description": "Filtrer les utilisateurs par nom",
                         "required": false,
                         "schema": {
                             "type": "string"
                         }
                     },
                     {
-                        "name": "last_name",
-                        "in": "query",
-                        "description": "Filter users by last name",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "description": "Filter users by email",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "status",
+                        "name": "filter[status]",
                         "in": "query",
                         "description": "Filter users by status ('active' or 'inactive')",
                         "required": false,
                         "schema": {
-                            "type": "string",
+                            "type": "inumber",
                             "enum": [
+                                "--",
                                 "active",
-                                "inactive"
+                                "inactive",
+                                "Supprimer"
                             ]
                         }
                     }
@@ -449,43 +448,22 @@
                 "operationId": "getGuestUsers",
                 "parameters": [
                     {
-                        "name": "first_name",
+                        "name": "filter[first_name]",
                         "in": "query",
-                        "description": "Filter users by first name",
+                        "description": "Filtrer les utilisateurs par prénom",
                         "required": false,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "example": "emelie"
                     },
                     {
-                        "name": "last_name",
+                        "name": "filter[last_name]",
                         "in": "query",
-                        "description": "Filter users by last name",
+                        "description": "Filtrer les utilisateurs par nom",
                         "required": false,
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "description": "Filter users by email",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Filter users by status ('active' or 'inactive')",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "active",
-                                "inactive"
-                            ]
                         }
                     }
                 ],
@@ -959,8 +937,8 @@
             "description": "Authentification"
         },
         {
-            "name": "Authentication",
-            "description": "Authentication"
+            "name": "Profile",
+            "description": "Profile"
         },
         {
             "name": "User",
