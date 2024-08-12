@@ -15,6 +15,50 @@ use Illuminate\Support\Facades\Log;
 class UsersInvitationController extends Controller
 {
 
+    /**
+     * @OA\Delete(
+     *     path="/api/invitations/{id}",
+     *     summary="Delete an invitation",
+     *     description="Deletes an invitation by its ID.",
+     *     operationId="deleteInvitation",
+     *     tags={"Invitation"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer"),
+     *         description="The ID of the invitation to delete"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Invitation deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=true
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Invitation deleted"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="null"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Invitation not found"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function delete(Request $request, UsersInvitation $invitation): JsonResponse
     {
         $invitation->delete();
@@ -26,10 +70,131 @@ class UsersInvitationController extends Controller
     }
 
     /**
-     * @description  Confirmer l'invitation d'un utilisateur
-     *
-     * @param invitationRequest $request
-     * @return JsonResponse
+     * @OA\Post(
+     *     path="/api/invitations/confirm",
+     *     summary="Confirm user invitation",
+     *     description="Confirms a user's invitation and activates their account.",
+     *     operationId="confirmInvitation",
+     *     tags={"Invitation"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             properties={
+     *                 @OA\Property(
+     *                      property="token",
+     *                      type="string",
+     *                      description="The token for confirming the invitation",
+     *                      example="abcd1234"
+     *                  ),
+     *                  @OA\Property(
+     *                       property="password",
+     *                       type="string",
+     *                       description="The password for the user",
+     *                       example="password123"
+     *                   ),
+     *                  @OA\Property(
+     *                       property="password_confirmation",
+     *                       type="string",
+     *                       description="The confirmation of the password",
+     *                       example="password123"
+     *                   )
+     *             }
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User confirmed successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             properties={
+     *                 @OA\Property(
+     *                     property="status",
+     *                     type="boolean",
+     *                     example=true
+     *                 ),
+     *                 @OA\Property(
+     *                     property="message",
+     *                     type="string",
+     *                     example="User confirmed"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     ref="#/components/schemas/User"
+     *                 )
+     *             }
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid token or other validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             properties={
+     *                 @OA\Property(
+     *                     property="status",
+     *                     type="boolean",
+     *                     example=false
+     *                 ),
+     *                 @OA\Property(
+     *                     property="message",
+     *                     type="string",
+     *                     example="Invitation expired or invalid"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="null"
+     *                 )
+     *             }
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User or invitation not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             properties={
+     *                 @OA\Property(
+     *                     property="status",
+     *                     type="boolean",
+     *                     example=false
+     *                 ),
+     *                 @OA\Property(
+     *                     property="message",
+     *                     type="string",
+     *                     example="User or invitation not found"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="null"
+     *                 )
+     *             }
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             properties={
+     *                 @OA\Property(
+     *                     property="status",
+     *                     type="boolean",
+     *                     example=false
+     *                 ),
+     *                 @OA\Property(
+     *                     property="message",
+     *                     type="string",
+     *                     example="Unauthorized"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="null"
+     *                 )
+     *             }
+     *         )
+     *     )
+     * )
      */
     public function confirmInvitation(invitationRequest $request): JsonResponse
     {

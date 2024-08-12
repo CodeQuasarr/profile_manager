@@ -646,6 +646,189 @@
                     }
                 }
             }
+        },
+        "/api/invitations/{id}": {
+            "delete": {
+                "tags": [
+                    "Invitation"
+                ],
+                "summary": "Delete an invitation",
+                "description": "Deletes an invitation by its ID.",
+                "operationId": "deleteInvitation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the invitation to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Invitation deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invitation deleted"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Invitation not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/invitations/confirm": {
+            "post": {
+                "tags": [
+                    "Invitation"
+                ],
+                "summary": "Confirm user invitation",
+                "description": "Confirms a user's invitation and activates their account.",
+                "operationId": "confirmInvitation",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "token": {
+                                        "description": "The token for confirming the invitation",
+                                        "type": "string",
+                                        "example": "abcd1234"
+                                    },
+                                    "password": {
+                                        "description": "The password for the user",
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "description": "The confirmation of the password",
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User confirmed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User confirmed"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid token or other validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invitation expired or invalid"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User or invitation not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User or invitation not found"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -711,6 +894,52 @@
                     }
                 },
                 "type": "object"
+            },
+            "UsersInvitation": {
+                "title": "Users Invitation",
+                "description": "Invitation model for users",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the invitation",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "coach_id": {
+                        "description": "The ID of the coach who sent the invitation",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "email": {
+                        "description": "The email address of the invitee",
+                        "type": "string",
+                        "format": "email",
+                        "example": "invitee@example.com"
+                    },
+                    "token": {
+                        "description": "The token used for invitation confirmation",
+                        "type": "string",
+                        "example": "abcd1234"
+                    },
+                    "created_at": {
+                        "description": "The date and time the invitation was created",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-08-12T09:07:23.624Z"
+                    },
+                    "updated_at": {
+                        "description": "The date and time the invitation was last updated",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-08-12T09:07:23.624Z"
+                    },
+                    "deleted_at": {
+                        "description": "The date and time the invitation was soft deleted",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-08-12T09:07:23.624Z"
+                    }
+                },
+                "type": "object"
             }
         }
     },
@@ -722,6 +951,10 @@
         {
             "name": "User",
             "description": "User"
+        },
+        {
+            "name": "Invitation",
+            "description": "Invitation"
         }
     ]
 }
