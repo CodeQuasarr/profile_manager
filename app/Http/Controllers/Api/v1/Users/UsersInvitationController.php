@@ -71,7 +71,7 @@ class UsersInvitationController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/invitations/confirm",
+     *     path="/api/v1/invitations/confirm",
      *     summary="Confirm user invitation",
      *     description="Confirms a user's invitation and activates their account.",
      *     operationId="confirmInvitation",

@@ -164,16 +164,48 @@ class UserController extends ApiController
      *     security={{"bearer":{}}},
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(
-     *             type="object",
-     *             required={"first_name", "last_name", "email"},
-     *             @OA\Property(property="first_name", type="string", example="John"),
-     *             @OA\Property(property="last_name", type="string", example="Doe"),
-     *             @OA\Property(property="email", type="string", example="john.doe@example.com"),
-     *             @OA\Property(property="weight", type="number", format="float", example=75),
-     *             @OA\Property(property="height", type="number", format="float", example=180),
-     *             @OA\Property(property="game_position", type="string", example="Forward"),
-     *             @OA\Property(property="image", type="string", format="binary", description="Image file")
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="first_name",
+     *                     type="string",
+     *                     example="John"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="last_name",
+     *                     type="string",
+     *                     example="Doe"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="email",
+     *                     type="string",
+     *                     example="john.doe@example.com"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="weight",
+     *                     type="number",
+     *                     format="float",
+     *                     example=75
+     *                 ),
+     *                 @OA\Property(
+     *                     property="height",
+     *                     type="number",
+     *                     format="float",
+     *                     example=180
+     *                 ),
+     *                 @OA\Property(
+     *                     property="game_position",
+     *                     type="string",
+     *                     example="Forward"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="image",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Optional image file"
+     *                 )
+     *             ),
      *         )
      *     ),
      *     @OA\Response(
@@ -184,7 +216,6 @@ class UserController extends ApiController
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized"
-     *
      *     )
      * )
      */
@@ -206,6 +237,9 @@ class UserController extends ApiController
 
         // Traitement de l'image
         if ($request->hasFile('image')) {
+            $request->validate([
+                'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
             $imageName = time() . '.' . $request->file('image')->getClientOriginalExtension();
             $request->file('image')->storeAs('images', $imageName, 'public');
             $fields->put('image', $imageName);
@@ -282,36 +316,61 @@ class UserController extends ApiController
 
     /**
      * @OA\Put(
-     *     path="/api/v1/users/{id}",
-     *     summary="Update a specific user",
-     *     description="Updates the details of a specific user by ID.",
+     *      path="/api/v1/users/{id}",
+     *      summary="Update a specific user",
+     *      description="Updates the details of a specific user by ID. Allows the optional upload of an image.",
      *      security={{"bearer":{}}},
-     *     operationId="updateUser",
-     *     tags={"User"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer"),
-     *         description="The ID of the user to update"
-     *     ),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/User")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="User updated successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/User")
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="User not found"
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized"
-     *     )
+     *      operationId="updateUser",
+     *      tags={"User"},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          @OA\Schema(type="integer"),
+     *              description="The ID of the user to update"
+     *          ),
+     *          @OA\RequestBody(
+     *              required=true,
+     *              @OA\MediaType(
+     *                  mediaType="multipart/form-data",
+     *                  @OA\Schema(
+     *                      @OA\Property(
+     *                          property="first_name",
+     *                          type="string",
+     *                          example="John"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="last_name",
+     *                          type="string",
+     *                          example="Doe"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="email",
+     *                          type="string",
+     *                          example="john.doe@example.com"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="image",
+     *                          type="string",
+     *                          format="binary",
+     *                          description="Optional image file"
+     *                      )
+     *                  )
+     *              )
+     *          ),
+     *          @OA\Response(
+     *              response=200,
+     *              description="User updated successfully",
+     *              @OA\JsonContent(ref="#/components/schemas/User")
+     *          ),
+     *          @OA\Response(
+     *          response=404,
+     *          description="User not found"
+     *          ),
+     *          @OA\Response(
+     *              response=401,
+     *              description="Unauthorized"
+     *          )
      * )
      */
     public function update(Request $request, User $user)
@@ -328,6 +387,9 @@ class UserController extends ApiController
         $fields = $this->getModelFields($user, collect($request->all()));
         // Handle image update
         if ($request->hasFile('image')) {
+            $request->validate([
+                'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
             $imageName = time() . '.' . $request->file('image')->getClientOriginalExtension();
             $request->file('image')->storeAs('images', $imageName, 'public');
             $fields->put('image_name', $imageName);
