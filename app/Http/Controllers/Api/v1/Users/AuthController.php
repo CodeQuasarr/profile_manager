@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1\Users;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -12,7 +13,6 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 /**
  * @OA\Info (
@@ -35,8 +35,8 @@ class AuthController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"email","password"},
-     *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="yourpassword")
+     *             @OA\Property(property="email", type="string", format="email", example="first_coach@team.eu"),
+     *             @OA\Property(property="password", type="string", format="password", example="password")
      *         )
      *     ),
      *     @OA\Response(
@@ -67,47 +67,28 @@ class AuthController extends Controller
         $user = Auth::user();
         $token = $user->createToken('access_token')->accessToken;
 
-        return response()->json([
-            'status' => true,
-            'message' => 'User logged in successfully',
-            'date' => [],
-            'token' => $token
-        ]);
+        return ApiResponse::return200(
+            'Authentification réussie. Bienvenue !',
+            ['token' => $token]
+        );
     }
 
     /**
      * @OA\Get(
-     *     path="/api/profile",
-     *     summary="Get the current user's profile",
-     *     description="Returns the authenticated user's profile information.",
-     *     operationId="getUserProfile",
-     *     tags={"Authentification"},
-     *     security={{"bearerAuth":{}}},
+     *     path="/api/v1/profile",
+     *     tags={"Authentication"},
+     *     summary="User profile",
+     *     description="User profile",
+     *     operationId="show",
+     *     security={{"bearer":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="User profile",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="User profile"),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="first_name", type="string", example="John"),
-     *                 @OA\Property(property="last_name", type="string", example="Doe"),
-     *                 @OA\Property(property="email", type="string", example="john.doe@example.com"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T12:00:00Z"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T12:00:00Z"),
-     *             ),
-     *         ),
+     *         description="successful operation",
      *     ),
      *     @OA\Response(
      *         response=401,
-     *         description="Unauthenticated",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated"),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object")),
-     *         ),
-     *     ),
+     *         description="Unauthennticated"
+     *     )
      * )
      */
     public function profile(Request $request): JsonResponse

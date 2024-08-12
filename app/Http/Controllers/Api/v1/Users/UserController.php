@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1\Users;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\User\UserRequest;
 use App\Http\Resources\UserCollection;
@@ -69,14 +70,7 @@ class UserController extends ApiController
      */
     public function index(Request $request): UserCollection | JsonResponse
     {
-        if (TheCurrent::user()->cannot('viewAny', User::class)) {
-            return response()->json([
-                'status' => false,
-                'code' => ResponseAlias::HTTP_UNAUTHORIZED,
-                'message' => 'Unauthorized',
-                'data' => null
-            ]);
-        }
+        TheCurrent::user()->cannot('viewAny', User::class);
 
         $me = TheCurrent::user(); // logged user
         $query = null;

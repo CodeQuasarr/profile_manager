@@ -27,12 +27,12 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "john.doe@example.com"
+                                        "example": "first_coach@team.eu"
                                     },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "yourpassword"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"
@@ -100,17 +100,29 @@
                 }
             }
         },
-        "/api/profile": {
+        "/api/v1/profile": {
             "get": {
                 "tags": [
-                    "Authentification"
+                    "User"
                 ],
-                "summary": "Get the current user's profile",
-                "description": "Returns the authenticated user's profile information.",
+                "summary": "Get user profile",
+                "description": "Retrieve the profile of the currently authenticated user.",
                 "operationId": "getUserProfile",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "The Bearer token used for authentication",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Bearer your_access_token"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "User profile",
+                        "description": "Successfully retrieved user profile",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -124,35 +136,7 @@
                                             "example": "User profile"
                                         },
                                         "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "first_name": {
-                                                    "type": "string",
-                                                    "example": "John"
-                                                },
-                                                "last_name": {
-                                                    "type": "string",
-                                                    "example": "Doe"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "example": "john.doe@example.com"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2023-01-01T12:00:00Z"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2023-01-01T12:00:00Z"
-                                                }
-                                            },
-                                            "type": "object"
+                                            "$ref": "#/components/schemas/User"
                                         }
                                     },
                                     "type": "object"
@@ -161,7 +145,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthenticated",
+                        "description": "Unauthorized",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -172,13 +156,33 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Unauthenticated"
+                                            "example": "Unauthorized"
                                         },
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object"
-                                            }
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        },
+                                        "data": {
+                                            "type": "null"
                                         }
                                     },
                                     "type": "object"
@@ -940,6 +944,14 @@
                     }
                 },
                 "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearer": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
             }
         }
     },
