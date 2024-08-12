@@ -24,7 +24,7 @@ cp .env.example .env or copy .env.example .env
 php artisan key:generate
 ```
 
-### Commande maison pour installer le necessaire au lencement de l'application
+### Commande maison pour installer le necessaire au lancement de l'application
 ```bash
 php artisan deploy
 ```
