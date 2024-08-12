@@ -42,7 +42,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User logged in successfully",
+                        "description": "L'utilisateur s'est connecté avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -110,7 +110,7 @@
                 "operationId": "show",
                 "responses": {
                     "200": {
-                        "description": "successful operation"
+                        "description": "Opération réussie"
                     },
                     "401": {
                         "description": "Unauthennticated"
