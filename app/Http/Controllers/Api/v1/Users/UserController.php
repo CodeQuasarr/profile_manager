@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\v1\Users;
 
-use App\Helpers\ApiResponse;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\User\UserRequest;
 use App\Http\Resources\UserCollection;
@@ -26,6 +25,7 @@ class UserController extends ApiController
      *     description="Returns a list of users. Supports filtering by name, email, and status.",
      *     operationId="getUsers",
      *     tags={"User"},
+     *     security={{"bearer":{}}},
      *     @OA\Parameter(
      *         name="first_name",
      *         in="query",
@@ -68,7 +68,7 @@ class UserController extends ApiController
      *     )
      * )
      */
-    public function index(Request $request): UserCollection | JsonResponse
+    public function index(Request $request): UserCollection|JsonResponse
     {
         TheCurrent::user()->cannot('viewAny', User::class);
 
@@ -76,11 +76,11 @@ class UserController extends ApiController
         $query = null;
 
         if ($me->hasRole(Role::COACH)) {
-            $query = QueryBuilder::for( $me->players() );
+            $query = QueryBuilder::for($me->players());
         } elseif ($me->hasRole(Role::PLAYER)) {
-            $query = QueryBuilder::for( $me->teammates() );
+            $query = QueryBuilder::for($me->teammates());
         } elseif ($me->hasRole(Role::ADMINISTRATOR)) {
-            $query = QueryBuilder::for( User::class );
+            $query = QueryBuilder::for(User::class);
         }
 
         $users = $query
@@ -149,7 +149,7 @@ class UserController extends ApiController
      */
     public function indexForGuest(): UserCollection
     {
-        $query = QueryBuilder::for( User::query()->loggedUserTeam() );
+        $query = QueryBuilder::for(User::query()->loggedUserTeam());
         $users = $query
             ->allowedFilters(['first_name', 'email'])
             ->paginate(5)
@@ -174,39 +174,40 @@ class UserController extends ApiController
     }
 
     /**
-     * @OA\Schema(
-     *     schema="UserCreateRequest",
-     *     type="object",
-     *     title="User Create Request",
-     *     description="Schema for creating a new user",
-     *     @OA\Property(
-     *         property="first_name",
-     *         type="string",
-     *         description="The first name of the user",
-     *         example="John"
+     * @OA\Post(
+     *     path="/api/v1/users",
+     *     summary="Create a new user",
+     *     description="Creates a new user. Required fields depend on the role of the logged-in user.",
+     *     operationId="createUser",
+     *     tags={"User"},
+     *     security={{"bearer":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"first_name", "last_name", "email"},
+     *             @OA\Property(property="first_name", type="string", example="John"),
+     *             @OA\Property(property="last_name", type="string", example="Doe"),
+     *             @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     *             @OA\Property(property="weight", type="number", format="float", example=75),
+     *             @OA\Property(property="height", type="number", format="float", example=180),
+     *             @OA\Property(property="game_position", type="string", example="Forward"),
+     *             @OA\Property(property="image", type="string", format="binary", description="Image file")
+     *         )
      *     ),
-     *     @OA\Property(
-     *         property="last_name",
-     *         type="string",
-     *         description="The last name of the user",
-     *         example="Doe"
+     *     @OA\Response(
+     *         response=201,
+     *         description="User created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/User")
      *     ),
-     *     @OA\Property(
-     *         property="email",
-     *         type="string",
-     *         format="email",
-     *         description="The email address of the user",
-     *         example="john.doe@example.com"
-     *     ),
-     *     @OA\Property(
-     *         property="password",
-     *         type="string",
-     *         description="The password for the user",
-     *         example="password123"
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *
      *     )
      * )
      */
-    public function store(UserRequest $request): UserResource | JsonResponse
+    public function store(UserRequest $request): UserResource|JsonResponse
     {
         if (TheCurrent::user()->cannot('create', User::class)) {
             return response()->json([
@@ -221,6 +222,14 @@ class UserController extends ApiController
         // An e-mail will be sent to the user via an observer and a job to confirm registration.
         $currentUser = TheCurrent::user();
         $fields = $this->getModelFields(new User(), collect($request->all()));
+
+        // Traitement de l'image
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->storeAs('images', $imageName, 'public');
+            $fields->put('image', $imageName);
+        }
+        $fields->put('password', bcrypt('password'));
         $user = User::create($fields->toArray());
 
         if (!$user) {
@@ -242,7 +251,7 @@ class UserController extends ApiController
             $user->coach_id = $currentUser->getKey();
         }
 
-         $user->save();
+        $user->save();
 
         return new UserResource($user->makeHidden(User::hideFields()));
     }
@@ -252,6 +261,7 @@ class UserController extends ApiController
      *     path="/api/v1/users/{id}",
      *     summary="Get a specific user",
      *     description="Returns the details of a specific user by ID.",
+     *      security={{"bearer":{}}},
      *     operationId="getUser",
      *     tags={"User"},
      *     @OA\Parameter(
@@ -294,6 +304,7 @@ class UserController extends ApiController
      *     path="/api/v1/users/{id}",
      *     summary="Update a specific user",
      *     description="Updates the details of a specific user by ID.",
+     *      security={{"bearer":{}}},
      *     operationId="updateUser",
      *     tags={"User"},
      *     @OA\Parameter(
@@ -324,7 +335,7 @@ class UserController extends ApiController
      */
     public function update(Request $request, User $user)
     {
-        if (TheCurrent::user()->cannot('view',$user)) {
+        if (TheCurrent::user()->cannot('view', $user)) {
             return response()->json([
                 'status' => false,
                 'code' => ResponseAlias::HTTP_UNAUTHORIZED,
@@ -334,6 +345,12 @@ class UserController extends ApiController
         }
 
         $fields = $this->getModelFields($user, collect($request->all()));
+        // Handle image update
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->storeAs('images', $imageName, 'public');
+            $fields->put('image_name', $imageName);
+        }
         $user->update($fields->toArray());
         return new UserResource($user->makeHidden(User::hideFields()));
     }
@@ -343,6 +360,7 @@ class UserController extends ApiController
      *     path="/api/v1/users/{id}",
      *     summary="Delete a specific user",
      *     description="Deletes a specific user by ID.",
+     *      security={{"bearer":{}}},
      *     operationId="softDeleteUser",
      *     tags={"User"},
      *     @OA\Parameter(
@@ -377,6 +395,13 @@ class UserController extends ApiController
             ]);
         }
 
+        if ($user->image) {
+            $path = public_path('storage/images/' . $user->image);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+
         $user->delete();
 
         return response()->json([
@@ -389,9 +414,10 @@ class UserController extends ApiController
 
     /**
      * @OA\Delete (
-     *     path="/api/v1/users/{id}/forces",
+     *     path="/api/v1/users/{id}/force",
      *     summary="Force delete a user",
      *     description="Permanently deletes a user from the database.",
+     *     security={{"bearer":{}}},
      *     operationId="forceDelete",
      *     tags={"User"},
      *     @OA\Parameter(
@@ -424,6 +450,13 @@ class UserController extends ApiController
                 'message' => 'Unauthorized',
                 'data' => null
             ]);
+        }
+
+        if ($user->image) {
+            $path = public_path('storage/images/' . $user->image);
+            if (file_exists($path)) {
+                unlink($path);
+            }
         }
 
         $user->forceDelete();

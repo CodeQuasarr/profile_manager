@@ -224,4 +224,10 @@ class User extends Authenticatable
     {
         return $this->hasRole(Role::PLAYER);
     }
+
+
+    public static function getImageUrl(string $imageName): string
+    {
+        return asset('storage/images/' . $imageName);
+    }
 }

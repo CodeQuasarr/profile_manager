@@ -22,6 +22,9 @@ class UserCollection extends ResourceCollection
             if (isset($item['game_position'])) {
                 $item['game_position'] = ['label' => $item['game_position'], 'description' => User::getPositionName($item['game_position'])];
             }
+            if (isset($item['image'])) {
+                $item['image'] = User::getImageUrl($item['image']);
+            }
             return $item;
         })->toArray();
     }
