@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1\Users;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\invitationRequest;
 use App\Models\Users\Role;
@@ -62,44 +63,39 @@ class UsersInvitationController extends Controller
     public function delete(Request $request, UsersInvitation $invitation): JsonResponse
     {
         $invitation->delete();
-        return response()->json([
-            'status' => true,
-            'message' => 'Invitation deleted',
-            'data' => null
-        ]);
+        return ApiResponse::return200('L\'invitation a été supprimée avec succès');
     }
 
     /**
      * @OA\Post(
-     *     path="/api/v1/invitations/confirm",
+     *     path="/api/v1/confirm-invitation",
      *     summary="Confirm user invitation",
      *     description="Confirms a user's invitation and activates their account.",
      *     operationId="confirmInvitation",
      *     tags={"Invitation"},
+     *     @OA\Parameter(
+     *         name="token",
+     *         in="query",
+     *         required=true,
+     *         @OA\Schema(type="string"),
+     *         description="The invitation token provided to the user"
+     *     ),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
      *             type="object",
-     *             properties={
-     *                 @OA\Property(
-     *                      property="token",
-     *                      type="string",
-     *                      description="The token for confirming the invitation",
-     *                      example="abcd1234"
-     *                  ),
-     *                  @OA\Property(
-     *                       property="password",
-     *                       type="string",
-     *                       description="The password for the user",
-     *                       example="password123"
-     *                   ),
-     *                  @OA\Property(
-     *                       property="password_confirmation",
-     *                       type="string",
-     *                       description="The confirmation of the password",
-     *                       example="password123"
-     *                   )
-     *             }
+     *             @OA\Property(
+     *                 property="password",
+     *                 type="string",
+     *                 description="The password for the user",
+     *                 example="password123"
+     *             ),
+     *             @OA\Property(
+     *                 property="password_confirmation",
+     *                 type="string",
+     *                 description="The confirmation of the password",
+     *                 example="password123"
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -107,22 +103,20 @@ class UsersInvitationController extends Controller
      *         description="User confirmed successfully",
      *         @OA\JsonContent(
      *             type="object",
-     *             properties={
-     *                 @OA\Property(
-     *                     property="status",
-     *                     type="boolean",
-     *                     example=true
-     *                 ),
-     *                 @OA\Property(
-     *                     property="message",
-     *                     type="string",
-     *                     example="User confirmed"
-     *                 ),
-     *                 @OA\Property(
-     *                     property="data",
-     *                     ref="#/components/schemas/User"
-     *                 )
-     *             }
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=true
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="User confirmed"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 ref="#/components/schemas/User"
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -130,22 +124,20 @@ class UsersInvitationController extends Controller
      *         description="Invalid token or other validation error",
      *         @OA\JsonContent(
      *             type="object",
-     *             properties={
-     *                 @OA\Property(
-     *                     property="status",
-     *                     type="boolean",
-     *                     example=false
-     *                 ),
-     *                 @OA\Property(
-     *                     property="message",
-     *                     type="string",
-     *                     example="Invitation expired or invalid"
-     *                 ),
-     *                 @OA\Property(
-     *                     property="data",
-     *                     type="null"
-     *                 )
-     *             }
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=false
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Invitation expired or invalid"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="null"
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -153,22 +145,20 @@ class UsersInvitationController extends Controller
      *         description="User or invitation not found",
      *         @OA\JsonContent(
      *             type="object",
-     *             properties={
-     *                 @OA\Property(
-     *                     property="status",
-     *                     type="boolean",
-     *                     example=false
-     *                 ),
-     *                 @OA\Property(
-     *                     property="message",
-     *                     type="string",
-     *                     example="User or invitation not found"
-     *                 ),
-     *                 @OA\Property(
-     *                     property="data",
-     *                     type="null"
-     *                 )
-     *             }
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=false
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="User or invitation not found"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="null"
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -176,22 +166,20 @@ class UsersInvitationController extends Controller
      *         description="Unauthorized",
      *         @OA\JsonContent(
      *             type="object",
-     *             properties={
-     *                 @OA\Property(
-     *                     property="status",
-     *                     type="boolean",
-     *                     example=false
-     *                 ),
-     *                 @OA\Property(
-     *                     property="message",
-     *                     type="string",
-     *                     example="Unauthorized"
-     *                 ),
-     *                 @OA\Property(
-     *                     property="data",
-     *                     type="null"
-     *                 )
-     *             }
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=false
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthorized"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="null"
+     *             )
      *         )
      *     )
      * )
@@ -205,21 +193,13 @@ class UsersInvitationController extends Controller
 
             if (is_null($invitation)) {
                 Log::error('Invitation not found');
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Invitation expirer ou invalide',
-                    'data' => null
-                ]);
+                return ApiResponse::return400('Invitation expired or invalid');
             }
 
             $user = User::findOrFail($payload['user_id']);
 
             if ($user->hasRole(Role::PLAYER)) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'User already confirmed',
-                    'data' => null
-                ]);
+                return ApiResponse::return409('L\'utilisateur a déjà confirmé son invitation');
             }
 
             $user->status = User::STATUS_ACTIVE;
@@ -230,26 +210,15 @@ class UsersInvitationController extends Controller
             $user->assignRole(Role::PLAYER);
 
             if (!$success) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'User not confirmed',
-                    'data' => null
-                ]);
+                return ApiResponse::return500('ccUne erreur est survenue lors de la confirmation de l\'invitation');
             }
 
             $invitation->delete();
+            return ApiResponse::return200('L\'utilisateur a été confirmé avec succès', $user);
 
-            return response()->json([
-                'status' => true,
-                'message' => 'User confirmed',
-                'data' => $user
-            ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Error',
-                'data' => $e->getMessage()
-            ]);
+            Log::error($e->getMessage());
+            return ApiResponse::return500( $e->getMessage());
         }
     }
 }

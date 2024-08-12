@@ -28,10 +28,6 @@ class deploy extends Command
         $this->info('Deploying application...');
         $this->line('');
 
-//        $this->alert('Vider le cache');
-//        $this->call('optimize:clear');
-//        $this->line('');
-
         if (file_exists(storage_path('app/profilmanager.cache'))) {
             $this->alert('Deleting profilmanager.cache');
             unlink(storage_path('app/profilmanager.cache'));
@@ -61,5 +57,11 @@ class deploy extends Command
         $this->call("roles-and-permissions-updated");
         $this->line("");
 
+        $this->alert("Générer les urls pour les fichiers de stockage (storage/app/public)");
+        $this->call("storage:link");
+        $this->line("");
+        $this->line("");
+
+        $this->info('Application deployer avec succès');
     }
 }

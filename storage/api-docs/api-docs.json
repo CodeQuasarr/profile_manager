@@ -721,7 +721,7 @@
                 }
             }
         },
-        "/api/v1/invitations/confirm": {
+        "/api/v1/confirm-invitation": {
             "post": {
                 "tags": [
                     "Invitation"
@@ -729,17 +729,23 @@
                 "summary": "Confirm user invitation",
                 "description": "Confirms a user's invitation and activates their account.",
                 "operationId": "confirmInvitation",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "The invitation token provided to the user",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "token": {
-                                        "description": "The token for confirming the invitation",
-                                        "type": "string",
-                                        "example": "abcd1234"
-                                    },
                                     "password": {
                                         "description": "The password for the user",
                                         "type": "string",

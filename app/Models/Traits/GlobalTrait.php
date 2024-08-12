@@ -2,6 +2,7 @@
 
 namespace App\Models\Traits;
 
+use App\Lib\TheCurrent;
 use App\Models\Users\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -32,8 +33,8 @@ trait GlobalTrait
     public static function hideFields(): array
     {
         $fields = [];
-        if (auth()->check()) {
-            $me = auth()->user();
+        if (TheCurrent::user()) {
+            $me = TheCurrent::user();
             if ($me->hasRole([Role::ADMINISTRATOR, Role::COACH, Role::PLAYER])) {
                 $fields = [
                     'password',

@@ -46,7 +46,7 @@ if (!function_exists('verifyToken')) {
         [$encryptedPayload, $signature] = explode('.', $decodedToken);
 
         if (!$encryptedPayload || !$signature) {
-            throw new \Exception('Invalid token');
+            throw new \Exception('le token est invalide');
         }
 
         $secretKey = config('app.token_secret_key');
@@ -54,7 +54,7 @@ if (!function_exists('verifyToken')) {
 
         // Vérification de la signature
         if (!hash_equals($expectedSignature, $signature)) {
-            throw new \Exception('Invalid token signature');
+            throw new \Exception('La signature du token est invalide');
         }
         return json_decode(Crypt::decryptString($encryptedPayload), true);
     }
@@ -72,7 +72,7 @@ if (!function_exists('check_token_expiration')) {
         $payload = verifyToken($token);
 
         if (Carbon::parse($payload['expires_at'])->isPast()) {
-            throw new \Exception('Token expired');
+            throw new \Exception('Le token a expiré');
         }
     }
 }

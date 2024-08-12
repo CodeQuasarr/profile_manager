@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Mail\SendSuccessfulAccountCreation;
 use Illuminate\Http\JsonResponse;
@@ -25,9 +26,7 @@ class MailController extends Controller
             Mail::to($email)->send(new SendSuccessfulAccountCreation($viewPath, $theSubject, $mailContents));
         } catch (\Exception $e) {
              Log::error($e->getMessage());
-            return response()->json([
-                'message' => 'Failed to send Auth API key '. $e->getMessage(),
-            ], 500);
+             return ApiResponse::return500('Une erreur est survenue lors de l\'envoi de l\'e-mail de confirmation de création de compte');
         }
     }
 }

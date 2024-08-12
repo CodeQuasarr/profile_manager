@@ -148,7 +148,7 @@ class User extends Authenticatable
 
     public function players(): HasMany
     {
-        return $this->loggedUserTeam()->hasMany(User::class, 'coach_id');
+        return $this->hasMany(User::class, 'coach_id');
     }
 
     public function teammates(): HasMany

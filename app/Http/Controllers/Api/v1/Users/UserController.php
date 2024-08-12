@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1\Users;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\User\UserRequest;
 use App\Http\Resources\UserCollection;
@@ -14,7 +15,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\QueryBuilder;
-use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class UserController extends ApiController
 {
@@ -68,7 +68,6 @@ class UserController extends ApiController
 
         $me = TheCurrent::user(); // logged user
         $query = null;
-
         if ($me->hasRole(Role::COACH)) {
             $query = QueryBuilder::for($me->players());
         } elseif ($me->hasRole(Role::PLAYER)) {
@@ -222,12 +221,7 @@ class UserController extends ApiController
     public function store(UserRequest $request): UserResource|JsonResponse
     {
         if (TheCurrent::user()->cannot('create', User::class)) {
-            return response()->json([
-                'status' => false,
-                'code' => ResponseAlias::HTTP_UNAUTHORIZED,
-                'message' => 'Unauthorized',
-                'data' => null
-            ]);
+            return ApiResponse::return401();
         }
 
         // A coach creates a profile for one of his players
@@ -248,11 +242,7 @@ class UserController extends ApiController
         $user = User::create($fields->toArray());
 
         if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'User not created',
-                'data' => null
-            ]);
+            return ApiResponse::return500();
         }
 
         if ($currentUser->hasRole(Role::ADMINISTRATOR)) {
@@ -304,12 +294,7 @@ class UserController extends ApiController
     public function show(User $user)
     {
         if (TheCurrent::user()->cannot('view', $user)) {
-            return response()->json([
-                'status' => false,
-                'code' => ResponseAlias::HTTP_UNAUTHORIZED,
-                'message' => 'Unauthorized',
-                'data' => null
-            ]);
+            return ApiResponse::return401('Action non autorisée');
         }
         new UserResource($user->makeHidden(User::hideFields()));
     }
@@ -373,15 +358,10 @@ class UserController extends ApiController
      *          )
      * )
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user): UserResource|JsonResponse
     {
         if (TheCurrent::user()->cannot('view', $user)) {
-            return response()->json([
-                'status' => false,
-                'code' => ResponseAlias::HTTP_UNAUTHORIZED,
-                'message' => 'Unauthorized',
-                'data' => null
-            ]);
+            return ApiResponse::return401('Action non autorisée');
         }
 
         $fields = $this->getModelFields($user, collect($request->all()));
@@ -427,15 +407,10 @@ class UserController extends ApiController
      *     )
      * )
      */
-    public function destroy(User $user)
+    public function destroy(User $user): JsonResponse
     {
         if (TheCurrent::user()->cannot('delete', $user)) {
-            return response()->json([
-                'status' => false,
-                'code' => ResponseAlias::HTTP_UNAUTHORIZED,
-                'message' => 'Unauthorized',
-                'data' => null
-            ]);
+            return ApiResponse::return401('Action non autorisée');
         }
 
         if ($user->image) {
@@ -446,13 +421,7 @@ class UserController extends ApiController
         }
 
         $user->delete();
-
-        return response()->json([
-            'status' => true,
-            'code' => ResponseAlias::HTTP_OK,
-            'message' => 'L\'utilisateur a été supprimé',
-            'data' => null
-        ]);
+        return ApiResponse::return200('L\'utilisateur a été supprimé avec succès');
     }
 
     /**
@@ -487,12 +456,7 @@ class UserController extends ApiController
     public function forceDelete(User $user): JsonResponse
     {
         if (TheCurrent::user()->cannot('forceDelete', $user)) {
-            return response()->json([
-                'status' => false,
-                'code' => ResponseAlias::HTTP_UNAUTHORIZED,
-                'message' => 'Unauthorized',
-                'data' => null
-            ]);
+            return ApiResponse::return401('Action non autorisée');
         }
 
         if ($user->image) {
@@ -503,11 +467,6 @@ class UserController extends ApiController
         }
 
         $user->forceDelete();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'L\'utilisateur a été supprimé définitivement',
-            'data' => null
-        ]);
+        return ApiResponse::return200('L\'utilisateur a été supprimé avec succès');
     }
 }

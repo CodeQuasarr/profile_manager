@@ -41,7 +41,7 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="User logged in successfully",
+     *         description="L'utilisateur s'est connecté avec succès",
      *         @OA\JsonContent(
      *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="User logged in successfully"),
@@ -83,7 +83,7 @@ class AuthController extends Controller
      *     security={{"bearer":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="successful operation",
+     *         description="Opération réussie",
      *     ),
      *     @OA\Response(
      *         response=401,
@@ -94,11 +94,7 @@ class AuthController extends Controller
     public function profile(Request $request): JsonResponse
     {
         $user = TheCurrent::user();
-        return response()->json([
-            'status' => true,
-            'message' => 'User profile',
-            'data' => $user
-        ]);
+        return ApiResponse::return200('Profile utilisateur', $user);
     }
 
     /**
@@ -152,20 +148,11 @@ class AuthController extends Controller
         $user->email_verified_at = Carbon::now();
         $succes = $user->save();
         if (!$succes) {
-            // return error
-            return response()->json([
-                'status' => false,
-                'message' => 'Une erreur s\'est produite, Veuillez réessayer',
-                'data' => []
-            ], 500);
+            return ApiResponse::return500('Une erreur s\'est produite, Veuillez réessayer');
         }
         $user->assignRole(Role::COACH);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Votre compte a été créé avec succès; Un email de confirmation vous a été envoyé',
-            'data' => []
-        ], 201);
+        return ApiResponse::return200('Votre compte a été créé avec succès; Un email de confirmation vous a été envoyé');
     }
 
     /**
