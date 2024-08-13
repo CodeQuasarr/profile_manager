@@ -76,5 +76,5 @@ APP_TOKEN_SECRET_KEY=your_secure_token
 ### 8. Documentation API (Swagger)
 ###### La documentation de l'API est générée avec Swagger. Pour y accéder, démarrez l'application et rendez-vous à l'URL suivante
 ```bash
-http://localhost:8000/api/documentation
+http://localhost:8000
 ```
